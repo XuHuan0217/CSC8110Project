@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>uk.ac.ncl.csc8110.huan</groupId>
+  <groupId>uk.ac.ncl.csc8110.huan.nosqlconsumer</groupId>
   <artifactId>Consumer</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -101,7 +101,7 @@
           <archive>
             <manifest>
               <mainClass>
-                uk.ac.ncl.csc8110.huan.App
+                  uk.ac.ncl.csc8110.huan.nosqlconsumer.App
               </mainClass>
             </manifest>
           </archive>
