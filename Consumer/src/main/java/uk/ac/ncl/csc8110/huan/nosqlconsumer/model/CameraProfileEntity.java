@@ -17,10 +17,7 @@ public class CameraProfileEntity extends TableServiceEntity {
     public CameraProfileEntity(String id,Date startTime){
         this.partitionKey = id;
         this.rowKey = Config.DATAFORMAT.format(startTime);
-
     }
-
-
 
 
     public String getStreet() {

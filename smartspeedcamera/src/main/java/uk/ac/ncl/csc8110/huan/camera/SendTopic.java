@@ -32,6 +32,7 @@ public class SendTopic {
         initTopic();
     }
 
+    // connect to  topics ervice
     private ServiceBusContract initService(){
         logger.info("init SendTopic...");
         if(service == null){
@@ -47,6 +48,7 @@ public class SendTopic {
         return service;
     }
 
+    // check topic exists.
     private void initTopic()  {
         logger.info("init Topic...");
         try {

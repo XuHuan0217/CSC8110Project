@@ -7,10 +7,8 @@ import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableBatchOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ncl.csc8110.huan.policemonitor.model.CameraProfile;
-import uk.ac.ncl.csc8110.huan.policemonitor.model.CameraProfileEntity;
 import uk.ac.ncl.csc8110.huan.policemonitor.model.Vehicle;
-import uk.ac.ncl.csc8110.huan.policemonitor.model.VehicleEntity;
+import uk.ac.ncl.csc8110.huan.policemonitor.model.OverSpeedVehicleEntity;
 
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -28,7 +26,7 @@ public class TableStorage {
                     "AccountKey="+Config.STORAGE_KEY;
     private final CloudTableClient cloudTableClient;
     private CloudTable policeTable;
-    private ConcurrentHashMap<String,ConcurrentLinkedQueue<VehicleEntity>> cache;
+    private ConcurrentHashMap<String,ConcurrentLinkedQueue<OverSpeedVehicleEntity>> cache;
     private TableBatchOperation tableOperations;
 
     public TableStorage(){
@@ -46,7 +44,7 @@ public class TableStorage {
             System.exit(-1);
         }
         cloudTableClient = account.createCloudTableClient();
-        this.cache = new ConcurrentHashMap<String, ConcurrentLinkedQueue<VehicleEntity>>();
+        this.cache = new ConcurrentHashMap<String, ConcurrentLinkedQueue<OverSpeedVehicleEntity>>();
         tableOperations = new TableBatchOperation();
         initTable();
         logger.info("init TableStorage success...");
@@ -85,20 +83,20 @@ public class TableStorage {
 //    }
 
     public void insertVehicle(Vehicle vehicle){
-        logger.debug("insert Vehicle {}",vehicle.getReg());
-        VehicleEntity entity = VehicleEntity.transfer(vehicle);
+        //logger.debug("insert Vehicle {}",vehicle.getReg());
+        OverSpeedVehicleEntity entity = OverSpeedVehicleEntity.transfer(vehicle);
         if (entity.isPriority()){
             logger.info("<PRIORITY>"+"--"+entity.getRowKey()+", "+entity.getSpeed()+" > "+entity.getMaxSpeed());
         }else {
             logger.info("<NON-PRIORITY>"+"--"+entity.getRowKey()+", "+entity.getSpeed()+" > "+entity.getMaxSpeed());
         }
         if(!cache.containsKey(entity.getPartitionKey())){
-            cache.put(entity.getPartitionKey(),new ConcurrentLinkedQueue<VehicleEntity>());
+            cache.put(entity.getPartitionKey(),new ConcurrentLinkedQueue<OverSpeedVehicleEntity>());
         }
-        ConcurrentLinkedQueue<VehicleEntity> queue = cache.get(entity.getPartitionKey());
+        ConcurrentLinkedQueue<OverSpeedVehicleEntity> queue = cache.get(entity.getPartitionKey());
         queue.offer(entity);
         if(queue.size()>=Config.BATCH_SIZE){
-            for(VehicleEntity entity1: queue){
+            for(OverSpeedVehicleEntity entity1: queue){
                 tableOperations.insertOrReplace(entity1);
             }
             try {

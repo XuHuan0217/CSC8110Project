@@ -10,9 +10,11 @@ import java.util.Date;
  */
 public class VehicleEntity extends TableServiceEntity {
 
+    private String reg;
     private int type;
     private int speed;
     private Date date;
+
     private String cameraId;
     private int maxSpeed;
     private String street;
@@ -20,17 +22,26 @@ public class VehicleEntity extends TableServiceEntity {
     private Date cameraStartDate;
 
 
-    public VehicleEntity(String cameraDetial,String reg){
+    public VehicleEntity(String cameraDetial,String regAndTime){
         this.partitionKey = cameraDetial;
-        this.rowKey = reg;
+        this.rowKey = regAndTime;
     }
-    private VehicleEntity(CameraProfile profile,String reg){
-        this(profile.getId() +"--"+ Config.DATAFORMAT.format(profile.getStartTime()),reg);
+    private VehicleEntity(CameraProfile profile,String reg,Date date){
+        this(profile.getId() +"-"+ Config.DATAFORMAT.format(profile.getStartTime())
+                ,reg+"-"+Config.DATAFORMAT.format(date));
         this.cameraId = profile.getId();
         this.maxSpeed = profile.getMaxSpeed();
         this.street = profile.getStreet();
         this.city = profile.getCity();
         this.cameraStartDate = profile.getStartTime();
+    }
+
+    public String getReg() {
+        return reg;
+    }
+
+    public void setReg(String reg) {
+        this.reg = reg;
     }
 
     public int getType() {
@@ -98,10 +109,11 @@ public class VehicleEntity extends TableServiceEntity {
     }
 
     public static VehicleEntity transfer(Vehicle vehicle){
-        VehicleEntity entity = new VehicleEntity(vehicle.getCameraProfile(),vehicle.getReg());
+        VehicleEntity entity = new VehicleEntity(vehicle.getCameraProfile(),vehicle.getReg(),vehicle.getDate());
         entity.setSpeed(vehicle.getSpeed());
         entity.setType(vehicle.getType());
         entity.setDate(vehicle.getDate());
+        entity.setReg(vehicle.getReg());
         return entity;
     }
 }

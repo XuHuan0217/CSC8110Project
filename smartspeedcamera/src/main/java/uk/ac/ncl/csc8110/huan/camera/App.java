@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class App {
     private final static Logger logger = LoggerFactory.getLogger(App.class.getName());
     public static void main( String[] args ) {
-        // parse arguments
+        // parse arguments to Config
         logger.info("CMD Argument Parsing...");
         CmdLineParser parser = new CmdLineParser(new Config());
         try {
@@ -23,8 +23,8 @@ public class App {
             System.exit(-1);
         }
         logger.info(Config.getConfig());
-
         logger.info("CameraSimulator Start...");
+        //start camera
         CameraSimulator cameraSimulator = new CameraSimulator();
         cameraSimulator.startCamera();
     }

@@ -35,6 +35,7 @@ public class TableStorage {
 
     public TableStorage(){
         logger.info("init TableStorage ...");
+        //create connection to Storage
         CloudStorageAccount account = null;
         try {
             account = CloudStorageAccount.parse(storageConnectionString);
@@ -48,11 +49,17 @@ public class TableStorage {
             System.exit(-1);
         }
         cloudTableClient = account.createCloudTableClient();
+        //cache for vehicle batch insert
         this.cache = new ConcurrentHashMap<String, ConcurrentLinkedQueue<VehicleEntity>>();
         tableOperations = new TableBatchOperation();
+
         initTable();
         logger.info("init TableStorage success...");
     }
+
+    /**
+     *  create table and get connection to table
+     */
     private void initTable(){
         logger.info("init Table");
         try {

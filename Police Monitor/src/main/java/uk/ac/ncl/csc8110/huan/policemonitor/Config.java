@@ -25,5 +25,4 @@ public class Config {
     final static int BATCH_SIZE = 2;
     public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss");
     //public final static String TOPIC_NAME = "CameraTopic";
-
 }

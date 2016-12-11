@@ -24,11 +24,14 @@ public class CameraSimulator implements Runnable{
     private CameraProfile profile;
 
     public CameraSimulator(){
+        //calculate period for sending.
         this.rate = Config.RATE;
         this.period = (60*1000)/this.rate;
-        //
+        //create send topic service
         service = new SendTopic();
+        // init scheduled executor service
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        // init local queue for message storage
         queue = new LinkedBlockingQueue<BrokeredMessage>();
         isProfileSent = false;
     }
@@ -38,6 +41,7 @@ public class CameraSimulator implements Runnable{
         startResendMonitor();
         scheduledExecutorService.scheduleAtFixedRate(this,0,period, TimeUnit.MILLISECONDS);
     }
+    //send camera information to topic
     private void initCamera(){
         if(!isProfileSent){
             logger.info("Sending Camera profile to Topic");
@@ -58,6 +62,8 @@ public class CameraSimulator implements Runnable{
         }
     }
 
+    //send vehicle information to topic
+    //store vehicle information if off-line
     public void run() {
         Vehicle vehicle = VehicleSimulator.getRandomVehicle(this.profile);
         logger.info("send vehicle: {} to Topic",vehicle.getReg());
@@ -73,6 +79,7 @@ public class CameraSimulator implements Runnable{
         }
     }
 
+    // resend local stored message
     private void startResendMonitor(){
         logger.info("start Resend Monitor");
         new Thread(new Runnable() {

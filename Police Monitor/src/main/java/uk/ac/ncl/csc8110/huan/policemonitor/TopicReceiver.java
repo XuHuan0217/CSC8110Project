@@ -99,6 +99,7 @@ public class TopicReceiver implements MessageListener{
             }
             SubscriptionInfo subInfo = new SubscriptionInfo(Config.SUB_NAME);
             service.createSubscription(topic.getTopicName(), subInfo);
+            // add filter
             RuleInfo ruleInfo = new RuleInfo("OverSpeedRule");
             ruleInfo = ruleInfo.withSqlExpressionFilter("OverSpeed > 0");
             service.createRule(topic.getTopicName(),Config.SUB_NAME,ruleInfo);
@@ -121,7 +122,7 @@ public class TopicReceiver implements MessageListener{
 
 
     public void onMessage(Message message) {
-        logger.info(message.toString());
+        //logger.info(message.toString());
         try {
             JmsBytesMessage bytesMessage = (JmsBytesMessage) message;
             String type = bytesMessage.getStringProperty("Type");

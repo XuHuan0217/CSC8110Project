@@ -18,10 +18,12 @@ public class Config {
     public static int MAX_SPEED;
     @Option(name = "-r",required = true,usage = "vehicle rate per min")
     public static int RATE;
-    @Option(name = "-gm",required = false,usage = "gaussian mean for random generator")
-    public static int GAUSSIAN_MEAN = 80;
+//    @Option(name = "-gm",required = false,usage = "gaussian mean for random generator")
+//    public static int GAUSSIAN_MEAN = 80;
     @Option(name = "-gd",required = false,usage = "gaussian deviation for random generator")
-    public  static int GAUSSIAN_DEVIATION = 20;
+    public  static int GAUSSIAN_DEVIATION = 15;
+    @Option(name = "-reg",required = false,usage = "registration plate files")
+    public static String REG_FILE = null;
 
     public static int RESEND_TIME = 500;
 

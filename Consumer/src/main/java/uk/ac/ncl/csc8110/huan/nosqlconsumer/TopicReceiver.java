@@ -42,12 +42,15 @@ public class TopicReceiver implements MessageListener{
         logger.info("init Topic Receiver...");
         //env.put(Context.INITIAL_CONTEXT_FACTORY,"org.apache.qpid.jms.jndi.JmsInitialContextFactory");
         //env.put(Context.PROVIDER_URL,"jndi.properties");
+        //create AMQP Connection
         InitialContext context = new InitialContext();
         ConnectionFactory cf = (ConnectionFactory) context.lookup("SBCONNECTIONFACTORY");
         this.topic = (Topic)context.lookup("TOPIC");
         this.connection = cf.createConnection(Config.KEY_NAME,Config.KEY_VALUE);
         this.connection.setExceptionListener(new MyExceptionListener());
+
         this.gson = new Gson();
+        //create table storage connection.
         this.tableStorage = new TableStorage();
         initService().initTopic().initSubscriber();
     }
@@ -114,18 +117,21 @@ public class TopicReceiver implements MessageListener{
         subscriber = session.createDurableSubscriber(topic,Config.SUB_NAME);
         subscriber.setMessageListener(this);
         connection.start();
+
     }
 
 
     public void onMessage(Message message) {
         try {
+            //read message
             JmsBytesMessage bytesMessage = (JmsBytesMessage) message;
             String type = bytesMessage.getStringProperty("Type");
             int length = new Long(bytesMessage.getBodyLength()).intValue();
-            byte[] b = new byte[length];
-            bytesMessage.readBytes(b, length);
+            byte[] data = new byte[length];
+            bytesMessage.readBytes(data, length);
+
             if(MsgType.valueOf(type) == MsgType.Profile) {
-                CameraProfile profile = gson.fromJson(new String(b),CameraProfile.class);
+                CameraProfile profile = gson.fromJson(new String(data),CameraProfile.class);
                 logger.info("receive camera profile:{}",profile.getId());
                 CameraProfile pro = tableStorage.insertProfile(profile);
                 while (pro!=null){
@@ -133,9 +139,9 @@ public class TopicReceiver implements MessageListener{
                     pro = tableStorage.insertProfile(profile);
                 }
             }else {
-                int overSpeed = bytesMessage.getIntProperty("OverSpeed");
-                Vehicle vehicle = gson.fromJson(new String(b), Vehicle.class);
-                logger.info("receive vehicle:{}",vehicle.getReg()+""+overSpeed);
+                //int overSpeed = bytesMessage.getIntProperty("OverSpeed");
+                Vehicle vehicle = gson.fromJson(new String(data), Vehicle.class);
+                logger.info("receive vehicle:{}",vehicle.getReg());
                 tableStorage.insertVehicle(vehicle);
             }
         } catch (JMSException e) {
