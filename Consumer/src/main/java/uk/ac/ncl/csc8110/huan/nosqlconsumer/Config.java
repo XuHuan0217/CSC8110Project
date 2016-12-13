@@ -22,8 +22,8 @@ public class Config {
     final static String CAMERA_TABLE_NAME="tablecamera";
     final static String VEHICLE_TABLE_NAME="tablevehicle";
 
-    final static int BATCH_SIZE = 10;
-    public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss");
+    final static int BATCH_SIZE = 5;
+    public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss.SSS");
     //public final static String TOPIC_NAME = "CameraTopic";
 
 }

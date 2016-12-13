@@ -6,10 +6,7 @@ import com.microsoft.windowsazure.exception.ServiceException;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusConfiguration;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusContract;
 import com.microsoft.windowsazure.services.servicebus.ServiceBusService;
-import com.microsoft.windowsazure.services.servicebus.models.CreateTopicResult;
-import com.microsoft.windowsazure.services.servicebus.models.RuleInfo;
-import com.microsoft.windowsazure.services.servicebus.models.SubscriptionInfo;
-import com.microsoft.windowsazure.services.servicebus.models.TopicInfo;
+import com.microsoft.windowsazure.services.servicebus.models.*;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +17,9 @@ import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -34,7 +34,8 @@ public class TopicReceiver implements MessageListener{
     private final Topic topic;
     private final Gson gson;
     private ServiceBusContract service;
-    private TableStorage tableStorage;
+    private SubscriptionInfo subscriptionInfo;
+   // private TableStorage tableStorage;
 
 
     public TopicReceiver() throws NamingException, JMSException {
@@ -47,7 +48,7 @@ public class TopicReceiver implements MessageListener{
         this.connection = cf.createConnection(Config.KEY_NAME,Config.KEY_VALUE);
         this.connection.setExceptionListener(new MyExceptionListener());
         this.gson = new Gson();
-        this.tableStorage = new TableStorage();
+        //this.tableStorage = new TableStorage();
         initService().initTopic().initSubscriber();
     }
     private TopicReceiver initService(){
@@ -99,10 +100,10 @@ public class TopicReceiver implements MessageListener{
             }
             SubscriptionInfo subInfo = new SubscriptionInfo(Config.SUB_NAME);
             service.createSubscription(topic.getTopicName(), subInfo);
-            RuleInfo ruleInfo = new RuleInfo("OverSpeedRule");
-            ruleInfo = ruleInfo.withSqlExpressionFilter("OverSpeed > 0");
-            service.createRule(topic.getTopicName(),Config.SUB_NAME,ruleInfo);
-            service.deleteRule(topic.getTopicName(),Config.SUB_NAME, "$Default");
+            //RuleInfo ruleInfo = new RuleInfo("OverSpeedRule");
+            //ruleInfo = ruleInfo.withSqlExpressionFilter("OverSpeed > 0");
+            //service.createRule(topic.getTopicName(),Config.SUB_NAME,ruleInfo);
+            //service.deleteRule(topic.getTopicName(),Config.SUB_NAME, "$Default");
         } catch (ServiceException e) {
             logger.error("Service Exception {}",e.getMessage());
             e.printStackTrace();
@@ -112,11 +113,29 @@ public class TopicReceiver implements MessageListener{
     }
 
     public void runReceiverAsynchronous() throws JMSException {
-        connection.setClientID("PoliceMonitor");
+        connection.setClientID("VehicleCheck");
         session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
         subscriber = session.createDurableSubscriber(topic,Config.SUB_NAME);
         subscriber.setMessageListener(this);
         connection.start();
+        startMessageCountMonitor();
+
+    }
+    private void startMessageCountMonitor()  {
+
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                try {
+                    subscriptionInfo = service.getSubscription(topic.getTopicName(),Config.SUB_NAME).getValue();
+                } catch (ServiceException e) {
+                    e.printStackTrace();
+                } catch (JMSException e) {
+                    e.printStackTrace();
+                }
+                logger.info("Message Count - {}",subscriptionInfo.getCountDetails().getActiveMessageCount());
+            }
+        },0,10,TimeUnit.SECONDS);
     }
 
 
@@ -134,10 +153,14 @@ public class TopicReceiver implements MessageListener{
                 int overspeed = bytesMessage.getIntProperty("OverSpeed");
                 Vehicle vehicle = gson.fromJson(new String(b), Vehicle.class);
                 logger.info("receive vehicle:{}",vehicle.getReg());
-                tableStorage.insertVehicle(vehicle);
+                TimeUnit.SECONDS.sleep(5);
+                // tableStorage.insertVehicle(vehicle);
             }
         } catch (JMSException e) {
             logger.error("JMS Exception.");
+            logger.error(e.getMessage());
+        }catch (InterruptedException e){
+            logger.error("Interrupted Exception.");
             logger.error(e.getMessage());
         }
     }

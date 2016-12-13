@@ -14,16 +14,17 @@ public class Config {
     final static String SERVICE_URL=".servicebus.windows.net";
 
     final static String SUB_NAME="VehicleCheck";
+    final static String QUEUE_NAME="policemonitorqueue";
 
     final static String STORAGE_NAME="huanstorage";
     final static String STORAGE_KEY="UJTfdDJqnA36sLXCVYUzVEnkzIVrVLyD4fNcmIrpUofjn50fsoCyNYbuYDL2257CoPAoRmhCaoquHUXVgw8xcQ==";
 
-    final static String CAMERA_TABLE_NAME="tablecamera";
-    final static String VEHICLE_TABLE_NAME="tablevehicle";
-    final static String POLICE_TABLE_NAME="tablepolice";
+//    final static String CAMERA_TABLE_NAME="tablecamera";
+//    final static String VEHICLE_TABLE_NAME="tablevehicle";
+//    final static String POLICE_TABLE_NAME="tablepolice";
     final static String VC_TABLE_NAME="tablevehiclecheck";
 
-    final static int BATCH_SIZE = 2;
-    public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss");
+   // final static int BATCH_SIZE = 2;
+    public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss.SSS");
     //public final static String TOPIC_NAME = "CameraTopic";
 }

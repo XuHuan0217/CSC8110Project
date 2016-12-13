@@ -15,6 +15,8 @@ import uk.ac.ncl.csc8110.huan.nosqlconsumer.model.VehicleEntity;
 
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -30,7 +32,7 @@ public class TableStorage {
     private final CloudTableClient cloudTableClient;
     private CloudTable cameraTable;
     private CloudTable vehicleTable;
-    private ConcurrentHashMap<String,ConcurrentLinkedQueue<VehicleEntity>> cache;
+    private ConcurrentHashMap<String,LinkedList<VehicleEntity>> cache;
     private TableBatchOperation tableOperations;
 
     public TableStorage(){
@@ -50,7 +52,7 @@ public class TableStorage {
         }
         cloudTableClient = account.createCloudTableClient();
         //cache for vehicle batch insert
-        this.cache = new ConcurrentHashMap<String, ConcurrentLinkedQueue<VehicleEntity>>();
+        this.cache = new ConcurrentHashMap<String, LinkedList<VehicleEntity>>();
         tableOperations = new TableBatchOperation();
 
         initTable();
@@ -99,14 +101,15 @@ public class TableStorage {
         logger.debug("insert Vehicle {}",vehicle.getReg());
         VehicleEntity entity = VehicleEntity.transfer(vehicle);
         if(!cache.containsKey(entity.getPartitionKey())){
-            cache.put(entity.getPartitionKey(),new ConcurrentLinkedQueue<VehicleEntity>());
+            cache.put(entity.getPartitionKey(),new LinkedList<VehicleEntity>());
         }
 
-        ConcurrentLinkedQueue<VehicleEntity> queue = cache.get(entity.getPartitionKey());
+        LinkedList<VehicleEntity> queue = cache.get(entity.getPartitionKey());
         queue.offer(entity);
         if(queue.size()>=Config.BATCH_SIZE){
             for(VehicleEntity entity1: queue){
                 tableOperations.insertOrReplace(entity1);
+
             }
             try {
                 vehicleTable.execute(tableOperations);
@@ -114,7 +117,18 @@ public class TableStorage {
                 queue.clear();
             } catch (StorageException e) {
                 logger.info("StorageException... Retry");
-                logger.info(e.getMessage());
+                logger.info(e.getExtendedErrorInformation().getErrorMessage());
+                logger.info(tableOperations.size()+","+queue.size());
+                for(Map.Entry<String,String[]> pairs: e.getExtendedErrorInformation().getAdditionalDetails().entrySet()){
+                    logger.info(pairs.getKey());
+                    for(String s: pairs.getValue()){
+                        logger.info(s);
+                    }
+                }
+                for (VehicleEntity entity1 :queue){
+                    logger.info(entity1.toString());
+                }
+                System.exit(-1);
             }
         }
     }

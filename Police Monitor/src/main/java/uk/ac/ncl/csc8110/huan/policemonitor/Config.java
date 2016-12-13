@@ -14,6 +14,7 @@ public class Config {
     final static String SERVICE_URL=".servicebus.windows.net";
 
     final static String SUB_NAME="PoliceMonitor";
+    final static String QUEUE_NAME="policemonitorqueue";
 
     final static String STORAGE_NAME="huanstorage";
     final static String STORAGE_KEY="UJTfdDJqnA36sLXCVYUzVEnkzIVrVLyD4fNcmIrpUofjn50fsoCyNYbuYDL2257CoPAoRmhCaoquHUXVgw8xcQ==";
@@ -23,6 +24,6 @@ public class Config {
     final static String POLICE_TABLE_NAME="tablepolice";
 
     final static int BATCH_SIZE = 2;
-    public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss");
+    public final static SimpleDateFormat DATAFORMAT = new SimpleDateFormat("yyyy.MM.dd - hh:mm:ss.SSS");
     //public final static String TOPIC_NAME = "CameraTopic";
 }

@@ -35,6 +35,7 @@ public class TopicReceiver implements MessageListener{
     private final Gson gson;
     private ServiceBusContract service;
     private TableStorage tableStorage;
+    private QueueStorage queueStorage;
 
 
     public TopicReceiver() throws NamingException, JMSException {
@@ -48,6 +49,7 @@ public class TopicReceiver implements MessageListener{
         this.connection.setExceptionListener(new MyExceptionListener());
         this.gson = new Gson();
         this.tableStorage = new TableStorage();
+        this.queueStorage = new QueueStorage();
         initService().initTopic().initSubscriber();
     }
     private TopicReceiver initService(){
@@ -136,6 +138,7 @@ public class TopicReceiver implements MessageListener{
                 Vehicle vehicle = gson.fromJson(new String(b), Vehicle.class);
                 logger.info("receive vehicle:{}",vehicle.getReg());
                 tableStorage.insertVehicle(vehicle);
+                queueStorage.sendMessage(vehicle);
             }
         } catch (JMSException e) {
             logger.error("JMS Exception.");

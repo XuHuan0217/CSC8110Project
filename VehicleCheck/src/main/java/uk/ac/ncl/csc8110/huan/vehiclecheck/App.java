@@ -9,7 +9,8 @@ import javax.naming.NamingException;
  */
 public class App {
     public static void main( String[] args ) throws JMSException, NamingException {
-        TopicReceiver receiver = new TopicReceiver();
-        receiver.runReceiverAsynchronous();
+        //TopicReceiver receiver = new TopicReceiver();
+        //receiver.runReceiverAsynchronous();
+        new QueueReceiver().startQueueReceiver();
     }
 }

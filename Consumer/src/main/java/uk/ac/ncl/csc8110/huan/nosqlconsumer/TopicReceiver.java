@@ -36,6 +36,7 @@ public class TopicReceiver implements MessageListener{
     private final Gson gson;
     private ServiceBusContract service;
     private TableStorage tableStorage;
+    private long count = 0;
 
 
     public TopicReceiver() throws NamingException, JMSException {
@@ -138,11 +139,17 @@ public class TopicReceiver implements MessageListener{
                     TimeUnit.SECONDS.sleep(1);
                     pro = tableStorage.insertProfile(profile);
                 }
-            }else {
+            }else if (MsgType.valueOf(type) == MsgType.Message){
+                count++;
+                if (count%100 == 0){
+                    logger.info("count:"+count);
+                }
                 //int overSpeed = bytesMessage.getIntProperty("OverSpeed");
                 Vehicle vehicle = gson.fromJson(new String(data), Vehicle.class);
-                logger.info("receive vehicle:{}",vehicle.getReg());
+                logger.debug("receive vehicle:{}",vehicle.getReg());
                 tableStorage.insertVehicle(vehicle);
+            }else {
+                logger.info("invalid message");
             }
         } catch (JMSException e) {
             logger.error("JMS Exception.");

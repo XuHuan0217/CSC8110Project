@@ -116,4 +116,21 @@ public class VehicleEntity extends TableServiceEntity {
         entity.setReg(vehicle.getReg());
         return entity;
     }
+
+    @Override
+    public String toString() {
+        return "VehicleEntity{" +
+                "partition="+this.partitionKey+ '\'' +
+                "rowkey="+this.rowKey+ '\'' +
+                "reg='" + reg + '\'' +
+                ", type=" + type +
+                ", speed=" + speed +
+                ", date=" + date +
+                ", cameraId='" + cameraId + '\'' +
+                ", maxSpeed=" + maxSpeed +
+                ", street='" + street + '\'' +
+                ", city='" + city + '\'' +
+                ", cameraStartDate=" + cameraStartDate +
+                '}';
+    }
 }
