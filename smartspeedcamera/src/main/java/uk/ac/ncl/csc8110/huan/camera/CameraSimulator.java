@@ -22,8 +22,10 @@ public class CameraSimulator implements Runnable{
     private final SendTopic service;
     private boolean isProfileSent;
     private CameraProfile profile;
+    private boolean offlineTest = false;
 
-    public CameraSimulator(){
+    public CameraSimulator(boolean offlineTest){
+        this.offlineTest = offlineTest;
         //calculate period for sending.
         this.rate = Config.RATE;
         this.period = (60*1000)/this.rate;
@@ -67,7 +69,7 @@ public class CameraSimulator implements Runnable{
     public void run() {
         Vehicle vehicle = VehicleSimulator.getRandomVehicle(this.profile);
         logger.info("send vehicle: {} to Topic",vehicle.getReg());
-        BrokeredMessage message = service.sendVehicleMessage(vehicle);
+        BrokeredMessage message = service.sendVehicleMessage(vehicle,this.offlineTest);
         if (message != null) {
             logger.info("sending failed..");
             try {
@@ -84,19 +86,22 @@ public class CameraSimulator implements Runnable{
         logger.info("start Resend Monitor");
         new Thread(new Runnable() {
             public void run() {
-                try {
-                    BrokeredMessage msg = queue.take();
-                    logger.info("ResendMonitor: resending message...");
-                    BrokeredMessage message = service.resend(msg);
-                    TimeUnit.MILLISECONDS.sleep(Config.RESEND_TIME);
-                    while(message!=null) {
-                        logger.info("ResendMonitor: resend failed...");
+                while(true) {
+                    try {
+                        BrokeredMessage msg = queue.take();
                         logger.info("ResendMonitor: resending message...");
-                        message = service.resend(msg);
+                        BrokeredMessage message = service.resend(msg);
                         TimeUnit.MILLISECONDS.sleep(Config.RESEND_TIME);
+                        while (message != null) {
+                            logger.info("ResendMonitor: resend failed...");
+                            logger.info("ResendMonitor: resending message...");
+                            message = service.resend(msg);
+                            TimeUnit.MILLISECONDS.sleep(Config.RESEND_TIME);
+                        }
+                        logger.info("ResendMonitor: resend success ");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }).start();

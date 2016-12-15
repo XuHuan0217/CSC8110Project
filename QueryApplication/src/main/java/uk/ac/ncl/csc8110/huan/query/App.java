@@ -7,7 +7,7 @@ package uk.ac.ncl.csc8110.huan.query;
 public class App {
     public static void main( String[] args ) {
         Query query = new Query();
-        //query.printAllCamera();
+        query.printAllCamera();
         query.printPriorityOverSpeedVehicle();
     }
 }

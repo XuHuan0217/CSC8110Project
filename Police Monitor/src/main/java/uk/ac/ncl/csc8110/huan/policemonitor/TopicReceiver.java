@@ -133,12 +133,14 @@ public class TopicReceiver implements MessageListener{
             bytesMessage.readBytes(b, length);
             if(MsgType.valueOf(type) == MsgType.Profile) {
                 throw new JMSException(" Profile message received");
-            }else {
+            }else if(MsgType.valueOf(type) == MsgType.Message){
                 int overspeed = bytesMessage.getIntProperty("OverSpeed");
                 Vehicle vehicle = gson.fromJson(new String(b), Vehicle.class);
                 logger.info("receive vehicle:{}",vehicle.getReg());
                 tableStorage.insertVehicle(vehicle);
                 queueStorage.sendMessage(vehicle);
+            }else {
+                logger.info("invalid message");
             }
         } catch (JMSException e) {
             logger.error("JMS Exception.");

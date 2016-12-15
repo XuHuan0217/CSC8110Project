@@ -21,8 +21,8 @@ public class QueueStorage {
     private final static Logger logger = LoggerFactory.getLogger(QueueStorage.class.getName());
     private static final String storageConnectionString =
             "DefaultEndpointsProtocol=https;" +
-                    "AccountName="+Config.STORAGE_NAME+";" +
-                    "AccountKey="+Config.STORAGE_KEY;
+                    "AccountName="+Config.STORAGE_QUEUE_NAME+";" +
+                    "AccountKey="+Config.STORAGE_QUEUE_KEY;
     private CloudQueue queue;
     private Gson gson;
 

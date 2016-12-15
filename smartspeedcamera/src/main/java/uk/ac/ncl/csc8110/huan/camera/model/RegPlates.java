@@ -15,30 +15,31 @@ import java.util.Random;
  * Created by huan on 2016/12/11.
  */
 public class RegPlates {
-    private List<String> regs;
+    private List<RegPlate> regs;
 
-    public List<String> getRegs() {
+
+    public List<RegPlate> getRegs() {
         return regs;
     }
 
-    public void setRegs(List<String> regs) {
+    public void setRegs(List<RegPlate> regs) {
         this.regs = regs;
     }
-    public void addRegs(String reg){
-        if(this.regs == null) this.regs = new ArrayList<String>();
-        this.regs.add(reg);
+    public void addRegs(String reg,Integer type){
+        if(this.regs == null) this.regs = new ArrayList<RegPlate>();
+        this.regs.add(new RegPlate(reg,type));
     }
 
-    public String getRandomReg(){
+    public RegPlate getRandomReg(){
         return regs.get(RandomUtils.nextInt(0,regs.size()));
     }
 
     public static void main(String [] args){
         String fileName = "RandomPlates";
-        int max = 100;
+        int max = 500;
         RegPlates regPlates = new RegPlates();
         for(int i =0;i<max;i++){
-            regPlates.addRegs(randomReg());
+            regPlates.addRegs(randomReg(),reandomType());
         }
         Gson gson = new Gson();
         try  {
@@ -56,5 +57,8 @@ public class RegPlates {
         int p2 = RandomUtils.nextInt(10, 100);
         String p3 = RandomStringUtils.randomAlphabetic(3).toUpperCase();
         return p1 + p2 + " " + p3;
+    }
+    private static Integer reandomType(){
+        return RandomUtils.nextInt(0,3);
     }
 }

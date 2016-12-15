@@ -103,13 +103,11 @@ public class TableStorage {
         if(!cache.containsKey(entity.getPartitionKey())){
             cache.put(entity.getPartitionKey(),new LinkedList<VehicleEntity>());
         }
-
         LinkedList<VehicleEntity> queue = cache.get(entity.getPartitionKey());
         queue.offer(entity);
         if(queue.size()>=Config.BATCH_SIZE){
             for(VehicleEntity entity1: queue){
                 tableOperations.insertOrReplace(entity1);
-
             }
             try {
                 vehicleTable.execute(tableOperations);
@@ -118,16 +116,10 @@ public class TableStorage {
             } catch (StorageException e) {
                 logger.info("StorageException... Retry");
                 logger.info(e.getExtendedErrorInformation().getErrorMessage());
-                logger.info(tableOperations.size()+","+queue.size());
-                for(Map.Entry<String,String[]> pairs: e.getExtendedErrorInformation().getAdditionalDetails().entrySet()){
-                    logger.info(pairs.getKey());
-                    for(String s: pairs.getValue()){
-                        logger.info(s);
-                    }
-                }
-                for (VehicleEntity entity1 :queue){
-                    logger.info(entity1.toString());
-                }
+//                logger.info(tableOperations.size()+","+queue.size());
+//                for (VehicleEntity entity1 :queue){
+//                    logger.info(entity1.toString());
+//                }
                 System.exit(-1);
             }
         }

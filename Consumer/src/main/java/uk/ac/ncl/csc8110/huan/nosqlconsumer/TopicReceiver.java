@@ -142,7 +142,7 @@ public class TopicReceiver implements MessageListener{
             }else if (MsgType.valueOf(type) == MsgType.Message){
                 count++;
                 if (count%100 == 0){
-                    logger.info("count:"+count);
+                    logger.info("receive count:"+count);
                 }
                 //int overSpeed = bytesMessage.getIntProperty("OverSpeed");
                 Vehicle vehicle = gson.fromJson(new String(data), Vehicle.class);

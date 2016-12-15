@@ -32,7 +32,7 @@ public class SendTopic {
         initTopic();
     }
 
-    // connect to  topics ervice
+    // connect to  topics service
     private ServiceBusContract initService(){
         logger.info("init SendTopic...");
         if(service == null){
@@ -61,9 +61,9 @@ public class SendTopic {
                 }
             }
            // logger.info("{} not exists : try to create", Config.TOPIC_NAME);
-            //TopicInfo topicInfo = new TopicInfo(Config.TOPIC_NAME);
-            //topicInfo.setEnableBatchedOperations(true);
-            //CreateTopicResult result = service.createTopic(topicInfo);
+            TopicInfo topicInfo = new TopicInfo(Config.TOPIC_NAME);
+            topicInfo.setEnableBatchedOperations(true);
+            CreateTopicResult result = service.createTopic(topicInfo);
             throw new ServiceException("Topic not found");
         }catch (ServiceException e){
             logger.error("Service Exception {}",e.getMessage());
@@ -98,7 +98,7 @@ public class SendTopic {
         return null;
     }
 
-    public synchronized BrokeredMessage sendVehicleMessage(Vehicle vehicle){
+    public synchronized BrokeredMessage sendVehicleMessage(Vehicle vehicle,boolean offline){
         String msg = gson.toJson(vehicle);
         BrokeredMessage message = new BrokeredMessage(msg);
         message.setProperty("Type", MsgType.Message);
@@ -108,6 +108,7 @@ public class SendTopic {
             message.setProperty("OverSpeed",0);
         }
         try {
+            if(offline & Math.random()>0.95) throw new ServiceException("Test offline Exception");
             service.sendTopicMessage(Config.TOPIC_NAME, message);
         } catch (ServiceException e) {
             logger.error("sendVehicleMessage failed Service Exception {}",e.getMessage());

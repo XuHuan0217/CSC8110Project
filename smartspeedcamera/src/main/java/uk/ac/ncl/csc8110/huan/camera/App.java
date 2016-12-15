@@ -25,7 +25,7 @@ public class App {
         logger.info(Config.getConfig());
         logger.info("CameraSimulator Start...");
         //start camera
-        CameraSimulator cameraSimulator = new CameraSimulator();
+        CameraSimulator cameraSimulator = new CameraSimulator(false);
         cameraSimulator.startCamera();
     }
 

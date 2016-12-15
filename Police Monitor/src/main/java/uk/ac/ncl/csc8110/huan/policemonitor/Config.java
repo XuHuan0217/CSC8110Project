@@ -19,6 +19,9 @@ public class Config {
     final static String STORAGE_NAME="huanstorage";
     final static String STORAGE_KEY="UJTfdDJqnA36sLXCVYUzVEnkzIVrVLyD4fNcmIrpUofjn50fsoCyNYbuYDL2257CoPAoRmhCaoquHUXVgw8xcQ==";
 
+    final static String STORAGE_QUEUE_NAME="huanclassic";
+    final static String STORAGE_QUEUE_KEY="dgxvkzsy6SQGml1uDWq6WKFA2qpMV8zxEFBzLxfwUVsviaUFyA22nohP6JkKa8Wo995S30WgoPc+ns9PptVMtA==";
+
     final static String CAMERA_TABLE_NAME="tablecamera";
     final static String VEHICLE_TABLE_NAME="tablevehicle";
     final static String POLICE_TABLE_NAME="tablepolice";
